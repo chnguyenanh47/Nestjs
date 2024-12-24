@@ -1,26 +1,43 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
+import { CreateGoogleUserDto } from './dto/create-google.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from '../user/entities/user.entity';
+import { Repository } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
-  }
+  constructor(
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+    private jwtService: JwtService,
+  ) {}
 
-  findAll() {
-    return `This action returns all auth`;
-  }
+  async loginWithGoogle() {}
+  async validateGoogleUser(goolgeUser: CreateGoogleUserDto) {
+    const user = await this.userRepository.findOne({
+      where: { email: goolgeUser.email },
+      select: ['id', 'email', 'password', 'role'],
+    });
+    if (user) return user;
+    const newUser = this.userRepository.create(goolgeUser);
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
+    return this.userRepository.save(newUser);
   }
+  generateTokens(user: any) {
+    const payload = { sub: user.id, email: user.email, role: user.role };
+    const accessToken = this.jwtService.sign(payload, {
+      secret: process.env.JWT_SECRET,
+      expiresIn: '1d',
+    });
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
+    const refreshToken = this.jwtService.sign(payload, {
+      secret: process.env.JWT_REFRESH_SECRET,
+      expiresIn: '7d',
+    });
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+    return { accessToken, refreshToken };
   }
 }

@@ -51,8 +51,17 @@ export class CategoryService {
     };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} category`;
+  async findOne(id: number): Promise<ResponseDto<Category>> {
+    const category = await this.categoryRepository.findOne({
+      where: { id },
+    });
+    if (!category) {
+      throw new HttpException('Danh mục không tồn tại', HttpStatus.NOT_FOUND);
+    }
+    return {
+      message: 'Danh mục đã được lấy thành công',
+      data: category,
+    };
   }
 
   update(id: number, updateCategoryDto: UpdateCategoryDto) {

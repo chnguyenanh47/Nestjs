@@ -12,6 +12,8 @@ import { UserModule } from './api/user/user.module';
 import { ProductModule } from './api/product/product.module';
 import { CategoryModule } from './api/category/category.module';
 import { PetModule } from './api/pet/pet.module';
+import googoleAuthConfig from './config/googole-auth.config';
+import { GoogleStrategy } from './strategies/google.strategies';
 
 @Module({
   imports: [
@@ -19,6 +21,7 @@ import { PetModule } from './api/pet/pet.module';
       envFilePath: '.env',
       isGlobal: true,
     }),
+    ConfigModule.forFeature(googoleAuthConfig),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -42,6 +45,6 @@ import { PetModule } from './api/pet/pet.module';
     PetModule,
   ],
   controllers: [AppController],
-  providers: [AppService, AuthGuard, AdminGuard],
+  providers: [AppService, AuthGuard, AdminGuard, GoogleStrategy],
 })
 export class AppModule {}

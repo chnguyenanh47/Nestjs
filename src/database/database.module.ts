@@ -2,6 +2,9 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Category } from 'src/api/category/entities/category.entity';
+import { Product } from 'src/api/product/entities/product.entity';
+import { Image } from 'src/api/entities/image/image.entity';
+import { User } from 'src/api/user/entities/user.entity';
 
 @Module({
   imports: [
@@ -16,7 +19,7 @@ import { Category } from 'src/api/category/entities/category.entity';
         username: configService.get('DATABASE_USER'),
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE_NAME'),
-        entities: [Category],
+        entities: [Category, Product, Image, User],
         synchronize: true,
       }),
     }),
